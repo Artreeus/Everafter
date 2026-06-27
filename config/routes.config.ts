@@ -2,6 +2,8 @@ export const routes = {
   home: '/',
   about: '/about',
   howItWorks: '/how-it-works',
+  privacy: '/privacy',
+  terms: '/terms',
 
   login: '/login',
   register: '/register',

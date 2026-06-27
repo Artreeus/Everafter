@@ -1,111 +1,99 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { FadeIn, SlideIn } from '@/components/animations'
-import { Flame, Clock, Mail } from 'lucide-react'
+import { motion }              from 'framer-motion'
+import { PenLine, Flame, Send } from 'lucide-react'
 
-const steps = [
+const STEPS = [
   {
     number: '01',
-    Icon:   PenFlame,
-    title:  'Create',
-    description:
-      'Write heartfelt letters, upload photos, record your voice, or capture a memory. Compose it exactly the way you feel it.',
-    accent: 'text-gold',
-    border: 'border-gold/20',
-    bg:     'bg-gold/5',
+    Icon:   PenLine,
+    title:  'Compose',
+    body:   'Write the letter. Add photos, record your voice, pin a memory. Build it slowly, the way the moment deserves — there is no rush.',
   },
   {
     number: '02',
-    Icon:   SealIcon,
+    Icon:   Flame,
     title:  'Seal',
-    description:
-      'Pick the perfect delivery date — an anniversary, a graduation, a birthday a decade from now. Then seal it with wax.',
-    accent: 'text-rose',
-    border: 'border-rose/20',
-    bg:     'bg-rose/5',
+    body:   'Choose the day it opens — a birthday a decade out, an anniversary, a graduation. Press the wax seal and it locks until then.',
   },
   {
     number: '03',
-    Icon:   DeliverIcon,
+    Icon:   Send,
     title:  'Deliver',
-    description:
-      'On that day, Everafter sends a beautiful opening experience your recipient will never forget.',
-    accent: 'text-charcoal',
-    border: 'border-stone',
-    bg:     'bg-cream',
+    body:   'When the day arrives, Everafter delivers it as an unhurried, cinematic reveal your person will never forget.',
   },
 ]
 
-function PenFlame() {
-  return <Flame size={22} />
-}
-function SealIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-      <circle cx="11" cy="11" r="9" />
-      <circle cx="11" cy="11" r="5" />
-      <line x1="11" y1="2" x2="11" y2="6" />
-      <line x1="11" y1="16" x2="11" y2="20" />
-      <line x1="2" y1="11" x2="6" y2="11" />
-      <line x1="16" y1="11" x2="20" y2="11" />
-    </svg>
-  )
-}
-function DeliverIcon() {
-  return <Mail size={22} />
+const fade = {
+  hidden:  { opacity: 0, y: 26 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, delay: i * 0.13, ease: 'easeOut' as const },
+  }),
 }
 
 export function HowItWorksSection() {
   return (
-    <section className="py-28 md:py-36 px-6 bg-ivory">
-      <div className="mx-auto max-w-5xl">
+    <section className="relative py-28 md:py-36 px-6 bg-ivory overflow-hidden">
+      {/* faint warm wash */}
+      <div aria-hidden className="pointer-events-none absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(196,165,90,0.06) 0%, transparent 60%)',
+      }} />
 
-        {/* Section label */}
-        <FadeIn inView className="text-center mb-16">
-          <p className="text-xs font-sans tracking-[0.2em] uppercase text-warm-gray mb-4">
-            How it works
-          </p>
-          <h2
-            className="font-display font-light text-charcoal text-balance"
-            style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}
-          >
-            Three moments.
-            <br />
-            <span className="text-warm-gray">A lifetime of meaning.</span>
+      <div className="relative mx-auto max-w-6xl">
+        {/* heading */}
+        <motion.div
+          variants={fade} custom={0}
+          initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}
+          className="text-center mb-20"
+        >
+          <div className="flex items-center justify-center gap-3 mb-5">
+            <div className="h-px w-8 bg-gold/45" />
+            <span className="text-[10px] text-warm-gray uppercase tracking-[0.22em] font-sans">How it works</span>
+            <div className="h-px w-8 bg-gold/45" />
+          </div>
+          <h2 className="font-display font-light text-charcoal text-balance" style={{ fontSize: 'clamp(2rem, 4.2vw, 3.1rem)' }}>
+            Three moments.<br />
+            <span className="text-warm-gray">A lifetime between them.</span>
           </h2>
-        </FadeIn>
+        </motion.div>
 
-        {/* Steps */}
-        <div className="grid md:grid-cols-3 gap-5">
-          {steps.map((step, i) => (
-            <SlideIn key={step.number} inView delay={i * 0.12}>
-              <div className={`rounded-2xl border ${step.border} ${step.bg} p-8 h-full flex flex-col`}>
-                <div className={`mb-5 ${step.accent}`}>
-                  <step.Icon />
-                </div>
-                <div className="flex items-baseline gap-3 mb-4">
-                  <span className={`font-display text-4xl font-light ${step.accent} opacity-40 leading-none`}>
-                    {step.number}
+        {/* steps with connecting line */}
+        <div className="relative">
+          {/* desktop connector */}
+          <div aria-hidden className="hidden md:block absolute top-[2.15rem] left-[16%] right-[16%] h-px">
+            <div className="h-full w-full bg-gradient-to-r from-transparent via-stone to-transparent" />
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12 md:gap-8">
+            {STEPS.map((step, i) => (
+              <motion.div
+                key={step.number}
+                variants={fade} custom={i + 1}
+                initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }}
+                className="relative flex flex-col items-center text-center"
+              >
+                {/* node */}
+                <div className="relative mb-7">
+                  <div className="flex h-[4.3rem] w-[4.3rem] items-center justify-center rounded-full bg-ivory border border-stone shadow-soft">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-charcoal text-ivory">
+                      <step.Icon size={19} strokeWidth={1.6} />
+                    </div>
+                  </div>
+                  <span className="absolute -top-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-gold text-[10px] font-semibold text-charcoal font-sans shadow-soft">
+                    {step.number.replace('0', '')}
                   </span>
-                  <h3 className="font-display text-xl text-charcoal">{step.title}</h3>
                 </div>
-                <p className="font-sans text-sm text-charcoal/60 leading-relaxed flex-1">
-                  {step.description}
-                </p>
-              </div>
-            </SlideIn>
-          ))}
-        </div>
 
-        {/* Connector line on desktop */}
-        <FadeIn inView className="hidden md:flex items-center justify-center mt-10 gap-2">
-          <div className="h-px flex-1 bg-stone/60" />
-          <span className="text-xs text-warm-gray/50 font-sans px-4">
-            From creation to delivery, we handle everything in between.
-          </span>
-          <div className="h-px flex-1 bg-stone/60" />
-        </FadeIn>
+                <h3 className="font-display text-xl text-charcoal mb-3">{step.title}</h3>
+                <p className="font-sans text-sm text-charcoal/55 leading-[1.7] max-w-[17rem]">
+                  {step.body}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   )

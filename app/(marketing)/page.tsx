@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { HeroSection }      from '@/features/marketing/components/HeroSection'
 import { HowItWorksSection } from '@/features/marketing/components/HowItWorksSection'
+import { FeaturesSection }  from '@/features/marketing/components/FeaturesSection'
 import { UseCasesSection }  from '@/features/marketing/components/UseCasesSection'
 import { ClosingSection }   from '@/features/marketing/components/ClosingSection'
 import { siteConfig }       from '@/config/site.config'
@@ -15,6 +16,7 @@ export default function LandingPage() {
     <>
       <HeroSection />
       <HowItWorksSection />
+      <FeaturesSection />
       <UseCasesSection />
       <ClosingSection />
     </>
