@@ -1,0 +1,5 @@
+export { FadeIn } from './FadeIn'
+export { SlideIn } from './SlideIn'
+export { FloatingElement } from './FloatingElement'
+export { StaggerChildren } from './StaggerChildren'
+export * from './variants'
