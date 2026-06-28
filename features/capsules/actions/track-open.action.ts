@@ -8,6 +8,7 @@ import { User }                     from '@/lib/db/models/User.model'
 import { sendCapsuleOpenedEmail }   from '@/features/notifications/lib/resend.service'
 import { formatDate }               from '@/lib/utils/dates'
 import { siteConfig }               from '@/config/site.config'
+import { checkRateLimit }           from '@/lib/utils/rate-limit'
 
 export interface OpeningData {
   capsule: {
@@ -42,6 +43,11 @@ export type TrackOpenResult =
   | { status: 'notFound' }
 
 export async function trackOpenAction(token: string): Promise<TrackOpenResult> {
+  // Throttle abnormal traffic (token enumeration / refresh hammering). Generous
+  // enough that a recipient re-reading their capsule never hits it.
+  const rl = await checkRateLimit('open:track', { limit: 30, windowMs: 60_000 })
+  if (!rl.ok) return { status: 'notFound' }
+
   await connectDB()
 
   const capsule = await Capsule.findOne({ 'recipients.deliveryToken': token })

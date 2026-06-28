@@ -7,6 +7,7 @@ import { CapsuleItem }        from '@/lib/db/models/CapsuleItem.model'
 import { CapsuleContributor } from '@/lib/db/models/CapsuleContributor.model'
 import { User }               from '@/lib/db/models/User.model'
 import { capsuleItemSchema }  from '@/features/capsules/schemas/capsule.schema'
+import { checkRateLimit }     from '@/lib/utils/rate-limit'
 
 // ── Get data + auto-accept ───────────────────────────────────────────────────
 
@@ -34,6 +35,10 @@ export type GetContributeDataResult =
   | { status: 'notFound' }
 
 export async function getContributeDataAction(inviteToken: string): Promise<GetContributeDataResult> {
+  // Generous limit — only abnormal automated traffic (token enumeration) should hit it.
+  const rl = await checkRateLimit('contribute:get', { limit: 60, windowMs: 60_000 })
+  if (!rl.ok) return { status: 'notFound' }
+
   await connectDB()
 
   const contributor = await CapsuleContributor.findOne({ inviteToken })
@@ -104,6 +109,9 @@ export async function addContributionAction(
   inviteToken: string,
   payload: z.infer<typeof capsuleItemSchema>,
 ): Promise<AddContributionResult> {
+  const rl = await checkRateLimit('contribute:add', { limit: 20, windowMs: 60_000 })
+  if (!rl.ok) return { success: false, error: 'Too many submissions. Please wait a moment and try again.' }
+
   const parsed = capsuleItemSchema.safeParse(payload)
   if (!parsed.success) {
     const first = Object.values(parsed.error.flatten().fieldErrors)[0]?.[0]
@@ -159,6 +167,9 @@ export async function removeContributionAction(
   inviteToken: string,
   itemId: string,
 ): Promise<RemoveContributionResult> {
+  const rl = await checkRateLimit('contribute:remove', { limit: 30, windowMs: 60_000 })
+  if (!rl.ok) return { success: false, error: 'Too many requests. Please wait a moment and try again.' }
+
   await connectDB()
 
   const contributor = await CapsuleContributor.findOne({ inviteToken, status: 'accepted' }).lean()

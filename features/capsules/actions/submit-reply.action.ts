@@ -7,6 +7,7 @@ import { CapsuleReply }     from '@/lib/db/models/CapsuleReply.model'
 import { User }             from '@/lib/db/models/User.model'
 import { sendCapsuleReplyEmail } from '@/features/notifications/lib/resend.service'
 import { siteConfig }           from '@/config/site.config'
+import { checkRateLimit }       from '@/lib/utils/rate-limit'
 
 const schema = z.object({
   token:   z.string().min(1),
@@ -21,6 +22,10 @@ export async function submitReplyAction(
   token: string,
   content: string,
 ): Promise<SubmitReplyResult> {
+  // Replies write to the DB and send an email — keep this tight.
+  const rl = await checkRateLimit('reply:submit', { limit: 5, windowMs: 5 * 60_000 })
+  if (!rl.ok) return { success: false, error: 'Too many replies. Please wait a few minutes and try again.' }
+
   const parsed = schema.safeParse({ token, content })
   if (!parsed.success) {
     const first = Object.values(parsed.error.flatten().fieldErrors)[0]?.[0]
