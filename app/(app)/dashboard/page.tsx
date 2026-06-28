@@ -3,7 +3,8 @@ import Link               from 'next/link'
 import { Plus }           from 'lucide-react'
 import { getSession }     from '@/lib/auth/session'
 import { getCapsulesAction } from '@/features/capsules/actions/get-capsule.action'
-import { CapsuleGrid }    from '@/features/capsules/components/CapsuleGrid'
+import { CapsuleBrowser, type CapsuleCardData } from '@/features/capsules/components/CapsuleBrowser'
+import { OnboardingEmptyState } from '@/features/capsules/components/OnboardingEmptyState'
 
 export const metadata: Metadata = { title: 'Dashboard — Everafter' }
 
@@ -21,6 +22,17 @@ export default async function DashboardPage() {
     sealed:    capsules.filter((c) => c.status === 'sealed').length,
     delivered: capsules.filter((c) => c.status === 'delivered').length,
   }
+
+  const cardData: CapsuleCardData[] = capsules.map((c) => ({
+    id:             c._id.toString(),
+    title:          c.title,
+    theme:          c.theme,
+    status:         c.status,
+    scheduledFor:   new Date(c.scheduledFor).toISOString(),
+    sealedAt:       c.sealedAt ? new Date(c.sealedAt).toISOString() : null,
+    recipientCount: c.recipients.length,
+    recurrence:     c.settings.recurrence,
+  }))
 
   return (
     <div className="px-6 py-10 max-w-6xl mx-auto">
@@ -55,8 +67,10 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Capsule grid */}
-      <CapsuleGrid capsules={capsules} />
+      {/* Capsules — onboarding for new users, browser otherwise */}
+      {stats.total === 0
+        ? <OnboardingEmptyState />
+        : <CapsuleBrowser capsules={cardData} />}
     </div>
   )
 }
