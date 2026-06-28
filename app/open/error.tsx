@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { reportError } from '@/lib/utils/log-error'
 
 interface ErrorProps {
   error: Error & { digest?: string }
@@ -9,7 +10,7 @@ interface ErrorProps {
 
 export default function OpenError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error(error)
+    reportError(error, { boundary: 'open', digest: error.digest })
   }, [error])
 
   return (

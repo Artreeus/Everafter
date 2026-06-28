@@ -3,6 +3,7 @@
 import { useEffect }   from 'react'
 import Link            from 'next/link'
 import { AlertCircle } from 'lucide-react'
+import { reportError } from '@/lib/utils/log-error'
 
 interface ErrorProps {
   error: Error & { digest?: string }
@@ -11,7 +12,7 @@ interface ErrorProps {
 
 export default function AppError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error(error)
+    reportError(error, { boundary: 'app', digest: error.digest })
   }, [error])
 
   return (
